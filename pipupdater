@@ -20,6 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import subprocess
 import sys
+from smooth_logger import Logger
 
 
 def str_starts_with(string: str, prefixes: list[str]):
@@ -36,36 +37,39 @@ def str_starts_with(string: str, prefixes: list[str]):
     return False
 
 
-prefixes: list[str] = ["DEPRECATION", "ERROR", "WARNING", "Package", "-------"]
+logger: Logger = Logger("pipupdater")
 
+prefixes: list[str] = ["DEPRECATION", "ERROR", "WARNING", "Package", "-------"]
 failed: list[str] = []
 success: list[str] = []
 
 for line in sys.stdin:
 
-    # Don't try to install debug/error output
+    # don't try to install debug/error output
     if str_starts_with(line, prefixes):
-        print(f"Skipping line: \"{line[:len(line)-1]}\"")  # slice removes new-line character
+        # slice here removes new-line character
+        logger.new(f"Skipping line: \"{line[:len(line)-1]}\"", "DEBUG") 
         continue
     
-    # Installation is attempted simply by trying to install whatever comes before the first space
+    # installation is attempted simply by trying to install whatever comes before the first space
     # in the line, if there are any spaces
     line_parts: list[str] = line.split(" ")
     try:
         subprocess.check_call(["pip", "install", "-U", line_parts[0]])
         success.append(line_parts[0])
     except Exception as e:
-        print(f"ERROR: Failed to update package: {line_parts[0]} ({e})")
+        logger.new(f"Failed to update package: {line_parts[0]} ({e})", "ERROR")
         failed.append(line_parts[0])
 
 if len(success) > 0:
-    print(
+    logger.new(
         "The following packages were updated (list does not include auto-installed dependencies): "
-        + ', '.join(success)
+        + ', '.join(success),
+        "INFO"
     )
 
 if len(failed) > 0:
-    print(f"Updates failed for the following packages: {', '.join(failed)}")
+    logger.new(f"Updates failed for the following packages: {', '.join(failed)}", "INFO")
 
 if len(success) == 0 and len(failed) == 0:
-    print("Nothing to do; did not find any out-of-date packages.")
+    logger.new("Nothing to do; did not find any out-of-date packages.", "INFO")
