@@ -19,4 +19,7 @@ Here's a list of things I plan to add or at least look into adding:
 - [ ] Include dependencies pip installs/updates in log of updated packages
 - [ ] A log message when no packages need updated (at the moment it just looks like nothing happened)
 - [ ] A proper setup file
+- [ ] Allow running as a single command
+- [ ] Properly capture & hide terminal output from pip commands
+- [ ] User config options
 - [ ] Dependency conflict management? (maybe) (possibly)
