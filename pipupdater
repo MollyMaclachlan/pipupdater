@@ -66,3 +66,6 @@ if len(success) > 0:
 
 if len(failed) > 0:
     print(f"Updates failed for the following packages: {', '.join(failed)}")
+
+if len(success) == 0 and len(failed) == 0:
+    print("Nothing to do; did not find any out-of-date packages.")
