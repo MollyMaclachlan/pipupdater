@@ -17,11 +17,12 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from pipupdatercore import pipupdater
-from smooth_logger import Logger
+if __name__ == "__main__":
 
+    from pipupdatercore import pipupdater
+    from smooth_logger import Logger
 
-logger: Logger = Logger("pipupdater")
-prefixes: list[str] = ["DEPRECATION", "ERROR", "WARNING", "Package", "-------"]
+    logger: Logger = Logger("pipupdater")
+    prefixes: list[str] = ["DEPRECATION", "ERROR", "WARNING", "Package", "-------"]
 
-pipupdater(prefixes, logger)
+    pipupdater(prefixes, logger)

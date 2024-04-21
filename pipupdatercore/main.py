@@ -57,7 +57,7 @@ def str_starts_with(string: str, prefixes: list[str]):
     return False
 
 
-def update_package(package: str, logger: Logger):
+def update_package(package: str, failed: list[str], success: list[str], logger: Logger):
     """
     Attempts to update a package with a given name, using subprocess.run() to execute a pip update
     command.
@@ -96,6 +96,6 @@ def pipupdater(prefixes: list[str], logger: Logger):
         
         # installation is attempted simply by trying to install whatever comes before the first space
         # in the line, if there are any spaces
-        update_package(line.split(" ")[0])
+        update_package(line.split(" ")[0], failed, success, logger)
 
     print_results(failed, success, logger)
