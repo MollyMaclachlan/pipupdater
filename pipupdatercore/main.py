@@ -18,6 +18,29 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import subprocess
 import sys
+from smooth_logger import Logger
+
+
+def print_results(failed: list[str], success: list[str], logger: Logger):
+    """
+    Outputs the results of the program.
+
+    :param failed: the list of packages that couldn't be updated
+    :param success: the list of packages that were successfully updated
+    :param logger: the logger instance
+    """
+    if len(success) > 0:
+        logger.new(
+            "The following packages were updated (list does not include auto-installed dependencies): "
+            + ', '.join(success),
+            "INFO"
+        )
+
+    if len(failed) > 0:
+        logger.new(f"Updates failed for the following packages: {', '.join(failed)}", "INFO")
+
+    if len(success) == 0 and len(failed) == 0:
+        logger.new("Nothing to do; did not find any out-of-date packages.", "INFO")
 
 
 def str_starts_with(string: str, prefixes: list[str]):
@@ -34,15 +57,34 @@ def str_starts_with(string: str, prefixes: list[str]):
     return False
 
 
-def pipupdater(logger: Logger, prefixes: list[str]):
+def update_package(package: str, logger: Logger):
+    """
+    Attempts to update a package with a given name, using subprocess.run() to execute a pip update
+    command.
+
+    :param package: the name of the package to update
+    :param logger: the logger instance
+    """
+    try:
+        subprocess.check_output(["pip", "install", "-U", package])
+        success.append(package)
+    except Exception as e:
+        logger.new(f"Failed to update package: {package} ({e})", "ERROR")
+        failed.append(package)
+
+
+def pipupdater(prefixes: list[str], logger: Logger):
     """
     The main function of pipupdater.
 
-    :param logger: the logger instance
     :param prefixes: a list of prefixes for discarding unneeded lines
+    :param logger: the logger instance
     """
+
     failed: list[str] = []
     success: list[str] = []
+
+    logger.new("Parsing package list...", "INFO")
 
     for line in sys.stdin:
 
@@ -54,23 +96,6 @@ def pipupdater(logger: Logger, prefixes: list[str]):
         
         # installation is attempted simply by trying to install whatever comes before the first space
         # in the line, if there are any spaces
-        line_parts: list[str] = line.split(" ")
-        try:
-            subprocess.check_call(["pip", "install", "-U", line_parts[0]])
-            success.append(line_parts[0])
-        except Exception as e:
-            logger.new(f"Failed to update package: {line_parts[0]} ({e})", "ERROR")
-            failed.append(line_parts[0])
+        update_package(line.split(" ")[0])
 
-    if len(success) > 0:
-        logger.new(
-            "The following packages were updated (list does not include auto-installed dependencies): "
-            + ', '.join(success),
-            "INFO"
-        )
-
-    if len(failed) > 0:
-        logger.new(f"Updates failed for the following packages: {', '.join(failed)}", "INFO")
-
-    if len(success) == 0 and len(failed) == 0:
-        logger.new("Nothing to do; did not find any out-of-date packages.", "INFO")
+    print_results(failed, success, logger)
