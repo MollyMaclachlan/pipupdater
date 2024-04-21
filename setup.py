@@ -21,7 +21,6 @@ setup(
     url="https://github.com/MurdoMaclachlan/pipupdater",
     packages=find_packages(),
     install_requires=[
-        "pip-check",
         "smooth_logger"
     ],
     classifiers=[
