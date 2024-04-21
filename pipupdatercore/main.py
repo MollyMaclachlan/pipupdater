@@ -66,7 +66,7 @@ def update_package(package: str, logger: Logger):
     :param logger: the logger instance
     """
     try:
-        subprocess.check_output(["pip", "install", "-U", package])
+        subprocess.run(["pip", "install", "-U", package], capture_output=True)
         success.append(package)
     except Exception as e:
         logger.new(f"Failed to update package: {package} ({e})", "ERROR")
