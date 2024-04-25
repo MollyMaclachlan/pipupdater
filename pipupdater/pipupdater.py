@@ -148,3 +148,13 @@ def pipupdater(prefixes: list[str], logger: Logger) -> None:
         update_package(package_details, failed, success, logger)
 
     print_results(failed, success, logger)
+
+
+def entry_point():
+    """
+    Entry point for the program. Creates the logger and prefixes array and starts the main function.
+    """
+    logger: Logger = Logger("pipupdater")
+    prefixes: list[str] = ["DEPRECATION", "ERROR", "WARNING", "Package", "-------"]
+
+    pipupdater(prefixes, logger)
