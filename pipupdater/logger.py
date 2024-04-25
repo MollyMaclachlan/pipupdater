@@ -24,7 +24,6 @@ class Logger(smooth_logger.Logger):
     Extends the base smooth_logger.Logger class with some useful methods for formatting and
     printing the final output.
     """
-
     def format_results(self, package_list: list[str]) -> str:
         """
         Formats a given list of packages to display in the following manner:
@@ -52,7 +51,7 @@ class Logger(smooth_logger.Logger):
         if len(success) > 0:
             self.new(
                 "The following packages were updated (list does not include auto-installed "
-                + f"dependencies):\n{self.format_results(success)}"
+                + f"dependencies):\n{self.format_results(success)}",
                 "INFO"
             )
 
