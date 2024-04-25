@@ -113,7 +113,7 @@ class Updater():
             # don't try to install debug/error output
             if str_starts_with(line, self.prefixes) or len(line) == 0:
                 # slice here removes new-line character
-                self.logger.new(f"Skipping line: \"{line[:len(line)-1]}\"", "DEBUG") 
+                self.logger.new(f"Skipping line: \"{line[:len(line)]}\"", "DEBUG")
                 continue
 
             package_details: list[str] = self.extract_package_details(line)
