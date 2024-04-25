@@ -145,7 +145,7 @@ def entry_point():
     """
     Entry point for the program. Creates the logger and prefixes array and starts the main function.
     """
-    logger: Logger = Logger("pipupdater", debug = Categories.ENABLED)
+    logger: Logger = Logger("pipupdater")
     prefixes: list[str] = ["DEPRECATION: ", "ERROR: ", "WARNING: ", "Package ", "-------"]
 
     updater: Updater = Updater(logger, prefixes)
