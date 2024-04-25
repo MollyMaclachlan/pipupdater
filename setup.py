@@ -1,5 +1,5 @@
 from setuptools import setup, find_packages
-from pipupdatercore import VERSION
+from pipupdater import VERSION
 
 
 def readme():

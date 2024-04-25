@@ -16,11 +16,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 
-from .logger import Logger
+def str_starts_with(string: str, prefixes: list[str]) -> bool:
+    """
+    Determines if a given string starts with any one of the given list of prefixes.
 
-from .utility import str_starts_with
-
-from .pipupdater import *
-
-
-VERSION = "1.0.0-alpha"
+    :param string: the string to check for prefixes in
+    :param prefixes: the list of prefixes
+    :return: whether the string begins with any one of the prefixes
+    """
+    for prefix in prefixes:
+        if string.startswith(prefix):
+            return True
+    return False
