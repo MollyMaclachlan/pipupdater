@@ -21,6 +21,3 @@ from .logger import Logger
 from .utility import str_starts_with
 
 from .pipupdater import *
-
-
-VERSION = "1.0.0-alpha"

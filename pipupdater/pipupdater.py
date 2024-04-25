@@ -21,6 +21,11 @@ import sys
 
 from .logger import Logger
 from .utility import str_starts_with
+from smooth_logger.enums import Categories
+from subprocess import CompletedProcess
+
+
+VERSION = "1.0.0-alpha"
 
 
 class Updater():
@@ -43,46 +48,80 @@ class Updater():
         Extracts the details of an outdated package from a given line. The details include the
         package name, its current version, and the latest version available to update to.
 
+        If a line cannot be parsed, a warning is issued and an empty list is returned.
+
         :param line: the line to extract details from
         :return: the package name, the current version and the latest version
         """
         # filter out empty characters for strings that use multiple spaces for formatting purposes
         line_parts: list[str] = list(filter(lambda x: x != '', line.split(" ")))
 
-        package: str = line_parts[0]
-        current_version: str = None
-        latest_version: str = None
+        try:
+            package: str = line_parts[0]
+            current_version: str = None
+            latest_version: str = None
 
-        # handles default 'pip list --outdated' format
-        if line_parts[1] == "(Current:":
-            current_version = line_parts[2]
-            latest_version = line_parts[4].removesuffix(")")
-        # handles 'pip list --outdated format=columns' format
-        else:
-            current_version = line_parts[1]
-            latest_version = line_parts[2]
+            # handles default 'pip list --outdated' format:
+            # [package name] (Current: [current version] Latest: [latest version])
+            if line_parts[1] == "(Current:":
+                current_version = line_parts[2]
+                latest_version = line_parts[4].removesuffix(")")
+            # handles 'pip list --outdated --format columns' format:
+            # [package name] [current version] [latest version]
+            else:
+                current_version = line_parts[1]
+                latest_version = line_parts[2]
 
-        return [package, current_version, latest_version]
+            return [package, current_version, latest_version]
+        except IndexError:
+            self.logger.new(
+                f"The following line was not formatted in a way that could be parsed: {line}",
+                "WARNING"
+            )
+            return []
+
+    def get_outdated_modules(self) -> list[str]:
+        """
+        Gets a list of outdated modules using the 'pip list --outdated' command. If this method
+        fails, pipupdater cannot continue and exits with status code 1.
+
+        :return: a list of outdated pip packages
+        """
+        try:
+            process: CompletedProcess = subprocess.run(
+                ["pip", "list", "--outdated"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True
+            )
+            return process.stdout.split("\n")
+        except Exception as e:
+            self.logger.new(f"Could not get list of outdated packages. Error was:\n{e}", "FATAL")
+            sys.exit(1)
 
     def update_all(self) -> None:
         """
-        Updates all packages using data from sys.stdin.
+        Updates all packages using a source in the form of a list of strings. Each item in the list
+        represents a line of data; packages should be separated by line breaks.
         """
-        self.logger.new("Parsing package list...", "INFO")
+        self.logger.new("Getting package list...", "INFO")
+        source: list[str] = self.get_outdated_modules()
 
-        for line in sys.stdin:
+        self.logger.new("Updating packages...", "INFO")
+        for line in source:
 
             # don't try to install debug/error output
-            if str_starts_with(line, prefixes):
+            if str_starts_with(line, self.prefixes) or len(line) == 0:
                 # slice here removes new-line character
                 self.logger.new(f"Skipping line: \"{line[:len(line)-1]}\"", "DEBUG") 
                 continue
 
             package_details: list[str] = self.extract_package_details(line)
 
-            # installation is attempted simply by trying to install whatever comes before the first
-            # space in the line, if there are any spaces
-            self.update_package(package_details)
+            # if there are not three items in the package details, something has gone wrong with
+            # the parsing, and pipupdater should not attempt to update the package
+            if len(package_details) == 3:
+                self.update_package(package_details)
 
         self.logger.print_results(self.failed, self.success)
 
@@ -106,8 +145,8 @@ def entry_point():
     """
     Entry point for the program. Creates the logger and prefixes array and starts the main function.
     """
-    logger: Logger = Logger("pipupdater")
-    prefixes: list[str] = ["DEPRECATION", "ERROR", "WARNING", "Package", "-------"]
+    logger: Logger = Logger("pipupdater", debug = Categories.ENABLED)
+    prefixes: list[str] = ["DEPRECATION: ", "ERROR: ", "WARNING: ", "Package ", "-------"]
 
     updater: Updater = Updater(logger, prefixes)
     updater.update_all()
