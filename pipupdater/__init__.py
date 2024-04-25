@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """
 Copyright (C) 2024  Murdo B. Maclachlan
 
@@ -17,12 +15,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-if __name__ == "__main__":
 
-    from pipupdatercore import pipupdater
-    from smooth_logger import Logger
+from .pipupdater import *
 
-    logger: Logger = Logger("pipupdater")
-    prefixes: list[str] = ["DEPRECATION", "ERROR", "WARNING", "Package", "-------"]
 
-    pipupdater(prefixes, logger)
+VERSION = "1.0.0-alpha"

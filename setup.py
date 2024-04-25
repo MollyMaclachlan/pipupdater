@@ -9,13 +9,9 @@ def readme():
 setup(
     name="pipupdater",
     version=VERSION,
-    scripts=["pipupdater"],
     author="Murdo Maclachlan",
     author_email="murdo@maclachlans.org.uk",
-    description=(
-        "A small command-line tool for automatically updating pip packages based on the output of "
-        + " the pip-check module."
-    ),
+    description="A small command-line tool for automatically updating out-of-date pip packages.",
     long_description=readme(),
     long_description_content_type="text/markdown",
     url="https://github.com/MurdoMaclachlan/pipupdater",
@@ -23,6 +19,11 @@ setup(
     install_requires=[
         "smooth_logger"
     ],
+    entry_points={
+        'console_scripts': [
+            'pipupdater = pipupdater.pipupdater:entry_point'
+        ]
+    },
     classifiers=[
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.7",
