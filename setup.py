@@ -11,7 +11,7 @@ setup(
     version=VERSION,
     author="Murdo Maclachlan",
     author_email="murdo@maclachlans.org.uk",
-    description="A small command-line tool for automatically updating out-of-date pip packages.",
+    description="A small command-line tool for automatically updating outdated pip packages.",
     long_description=readme(),
     long_description_content_type="text/markdown",
     url="https://github.com/MurdoMaclachlan/pipupdater",
