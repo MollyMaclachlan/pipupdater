@@ -94,9 +94,10 @@ class Updater():
                 stderr=subprocess.STDOUT,
                 text=True
             )
+            self.logger.save_pip_output(process.stdout)
             return process.stdout.split("\n")
         except Exception as e:
-            self.logger.new(f"Could not get list of outdated packages. Error was:\n{e}", "FATAL")
+            self.logger.new(f"Could not get list of outdated packages. Error was: {e}", "FATAL")
             sys.exit(1)
 
     def update_all(self) -> None:
@@ -134,7 +135,13 @@ class Updater():
         :param logger: the logger instance
         """
         try:
-            subprocess.run(["pip", "install", "-U", package_details[0]], capture_output=True)
+            process: CompletedProcess = subprocess.run(
+                ["pip", "install", "-U", package_details[0]],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True
+            )
+            self.logger.save_pip_output(process.stdout)
             self.success.append(package_details)
         except Exception as e:
             self.logger.new(f"Failed to update package: {package_details[0]} ({e})", "ERROR")
