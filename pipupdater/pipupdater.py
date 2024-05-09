@@ -15,12 +15,13 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-
+import argparse
 import subprocess
 import sys
 
 from .logger import Logger
 from .utility import str_starts_with
+from argparse import Namespace
 from smooth_logger.enums import Categories
 from subprocess import CompletedProcess
 
@@ -152,8 +153,30 @@ def entry_point():
     """
     Entry point for the program. Creates the logger and prefixes array and starts the main function.
     """
-    logger: Logger = Logger("pipupdater")
+    args: Namespace = get_args()
+
+    logger: Logger = Logger(
+        "pipupdater",
+        debug = Categories.MAXIMUM if args.debug else Categories.DISABLED
+    )
     prefixes: list[str] = ["DEPRECATION: ", "ERROR: ", "WARNING: ", "Package ", "-------"]
 
     updater: Updater = Updater(logger, prefixes)
     updater.update_all()
+
+
+def get_args():
+    """
+    Uses an ArgumentParser to parse in command-line arguments and return the resultant Namespace.
+
+    :returns: the Namespace produced by parsing arguments
+    """
+    parser = argparse.ArgumentParser(
+        prog='pipupdater',
+        description='A small command-line tool for automatically updating outdated pip packages.'
+    )
+
+    parser.add_argument('--debug', '-d', action='store_true', help="enable debug logging")
+    parser.add_argument('--version', '-v', action='version', version=f'%(prog)s {VERSION}')
+
+    return parser.parse_args()
