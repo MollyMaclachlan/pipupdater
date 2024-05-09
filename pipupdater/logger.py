@@ -115,6 +115,6 @@ class Logger(smooth_logger.Logger):
         :param output: the output to save
         """
         if self.save_path and self._scopes["DEBUG"] == Categories.MAXIMUM:
-            with open(f"{self.save_path}/pip_log-{self._get_time(method='date')}.txt",
+            with open(f"{self.save_path}/pip_log-{self._get_time(date_only=True)}.txt",
                       "at+") as save_file:
                 save_file.write(output)
