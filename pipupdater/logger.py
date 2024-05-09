@@ -34,7 +34,7 @@ class Logger(smooth_logger.Logger):
                  debug: int = Categories.DISABLED,
                  error: int = Categories.MAXIMUM,
                  fatal: int = Categories.MAXIMUM,
-                 info: int = Categories.ENABLED,
+                 info: int = Categories.PRINT,
                  warning: int = Categories.MAXIMUM):
         super().__init__(
             program_name,
@@ -71,7 +71,7 @@ class Logger(smooth_logger.Logger):
 
         :return: the location of the pip log folder
         """
-        save_path: str = self._Logger__output_path.removesuffix("logs") + "pip_logs"
+        save_path: str = self._output_path.removesuffix("logs") + "pip_logs"
         if not isdir(save_path):
             self.new(f"Making pip log folder: {save_path}", "INFO")
             try:
@@ -99,13 +99,11 @@ class Logger(smooth_logger.Logger):
                 + f"dependencies):\n{self.format_results(success)}",
                 "INFO"
             )
-
         if len(failed) > 0:
             self.new(
                 f"Updates failed for the following packages:\n{self.format_results(failed)}",
                 "INFO"
             )
-
         if len(success) == 0 and len(failed) == 0:
             self.new("Nothing to do; did not find any out-of-date packages.", "INFO")
 
@@ -116,7 +114,7 @@ class Logger(smooth_logger.Logger):
 
         :param output: the output to save
         """
-        if self.save_path and self._Logger__scopes["DEBUG"] == Categories.MAXIMUM:
-            with open(f"{self.save_path}/pip_log-{self._Logger__get_time(method='date')}.txt",
+        if self.save_path and self._scopes["DEBUG"] == Categories.MAXIMUM:
+            with open(f"{self.save_path}/pip_log-{self._get_time(method='date')}.txt",
                       "at+") as save_file:
                 save_file.write(output)

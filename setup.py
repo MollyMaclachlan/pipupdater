@@ -17,7 +17,7 @@ setup(
     url="https://github.com/MurdoMaclachlan/pipupdater",
     packages=find_packages(),
     install_requires=[
-        "smooth_logger"
+        "smooth_logger >= 1.0.0"
     ],
     entry_points={
         'console_scripts': [
