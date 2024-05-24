@@ -37,7 +37,8 @@ class Updater():
     :param prefixes: a list of prefixes for discarding unneeded lines
     :param logger: the logger instance
     """
-    def __init__(self, logger: Logger, prefixes: list[str]) -> None:
+    def __init__(self, args: Namespace, logger: Logger, prefixes: list[str]) -> None:
+        self.args: Namespace = args
         self.logger: Logger = logger
         self.prefixes: list[str] = prefixes
 
@@ -89,14 +90,17 @@ class Updater():
         :return: a list of outdated pip packages
         """
         try:
-            process: CompletedProcess = subprocess.run(
-                ["pip", "list", "--outdated"],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                text=True
-            )
-            self.logger.save_pip_output(process.stdout)
-            return process.stdout.split("\n")
+            if self.args.source is None:
+                process: CompletedProcess = subprocess.run(
+                    ["pip", "list", "--outdated"],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    text=True
+                )
+                self.logger.save_pip_output(process.stdout)
+                return process.stdout.split("\n")
+            else:
+                return open(self.args.source, "r").readlines()
         except Exception as e:
             self.logger.new(f"Could not get list of outdated packages. Error was: {e}", "FATAL")
             sys.exit(1)
@@ -161,7 +165,7 @@ def entry_point():
     )
     prefixes: list[str] = ["DEPRECATION: ", "ERROR: ", "WARNING: ", "Package ", "-------"]
 
-    updater: Updater = Updater(logger, prefixes)
+    updater: Updater = Updater(args, logger, prefixes)
     updater.update_all()
 
 
@@ -171,12 +175,15 @@ def get_args():
 
     :returns: the Namespace produced by parsing arguments
     """
-    parser = argparse.ArgumentParser(
+    parser: ArgumentParser = argparse.ArgumentParser(
         prog='pipupdater',
         description='A small command-line tool for automatically updating outdated pip packages.'
     )
 
-    parser.add_argument('--debug', '-d', action='store_true', help="enable debug logging")
-    parser.add_argument('--version', '-v', action='version', version=f'%(prog)s {VERSION}')
+    parser.add_argument("--debug", "-d", action="store_true", help="enable debug logging")
+    parser.add_argument("--source", "-s", action="store", default=None,
+                        help="provide a source file containing a list of outdated packages; if"
+                        + " left blank, pipupdater will query pip for this list")
+    parser.add_argument("--version", "-v", action="version", version=f"%(prog)s {VERSION}")
 
     return parser.parse_args()
