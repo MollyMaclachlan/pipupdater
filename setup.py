@@ -9,12 +9,12 @@ def readme():
 setup(
     name="pipupdater",
     version=VERSION,
-    author="Murdo Maclachlan",
+    author="Molly Maclachlan",
     author_email="murdo@maclachlans.org.uk",
     description="A small command-line tool for automatically updating outdated pip packages.",
     long_description=readme(),
     long_description_content_type="text/markdown",
-    url="https://github.com/MurdoMaclachlan/pipupdater",
+    url="https://github.com/MollyMaclachlan/pipupdater",
     packages=find_packages(),
     install_requires=[
         "smooth_logger >= 1.0.0"
