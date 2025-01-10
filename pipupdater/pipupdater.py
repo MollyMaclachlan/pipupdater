@@ -26,7 +26,7 @@ from smooth_logger.enums import Categories
 from subprocess import CompletedProcess
 
 
-VERSION = "1.0.0"
+VERSION = "1.1.0-pre"
 
 
 class Updater():
@@ -161,7 +161,11 @@ def entry_point():
 
     logger: Logger = Logger(
         "pipupdater",
-        debug = Categories.MAXIMUM if args.debug else Categories.DISABLED
+        debug = (
+            Categories.MAXIMUM if args.debug
+            else Categories.SAVE if args.save_pip
+            else Categories.DISABLED
+        )
     )
     prefixes: list[str] = ["DEPRECATION: ", "ERROR: ", "WARNING: ", "Package ", "-------"]
 
@@ -184,6 +188,8 @@ def get_args() -> Namespace:
     parser.add_argument("-s", "--source", action="store", default=None,
                         help="provide a source file containing a list of outdated packages; if"
                         + " left blank, pipupdater will query pip for this list")
+    parser.add_argument("-S", "--save-pip", action="store_true",
+                        help="save pip output without printing it to console")
     parser.add_argument("-v", "--version", action="version", version=f"%(prog)s {VERSION}")
 
     return parser.parse_args()
