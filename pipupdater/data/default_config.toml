@@ -1,0 +1,7 @@
+prefixes = [
+    "DEPRECATION: ",
+    "ERROR: ",
+    "WARNING: ",
+    "Package ",
+    "-------"
+]

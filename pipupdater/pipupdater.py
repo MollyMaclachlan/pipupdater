@@ -26,7 +26,7 @@ from smooth_logger.enums import Categories
 from subprocess import CompletedProcess
 
 
-VERSION = "1.1.0-pre"
+VERSION = "1.1.0-alpha"
 
 
 class Updater():
