@@ -6,7 +6,7 @@ This tool doesn't account for dependency conflicts and doesn't yet have any func
 
 ## Requirements & installation
 
-pipupdater can be installed by downloading the `.tar.gz` or `.whl` asset from the [latest release](https://github.com/MurdoMaclachlan/pipupdater/releases) and instructing pip to install the package, like so: `pip install pipupdater-x.y.z.tar.gz`. It can be updated in the same way, passing the `-U` argument to the installation command.
+pipupdater can be installed by downloading the `.tar.gz` or `.whl` asset from the [latest release](https://github.com/MollyMaclachlan/pipupdater/releases) and instructing pip to install the package, like so: `pip install pipupdater-x.y.z.tar.gz`. It can be updated in the same way, passing the `-U` argument to the installation command.
 
 You can run the program simply by entering `pipupdater` in the console; it will run the `pip list --outdated` command as a subprocess to see which packages are out of date, and then proceed to update them. Any packages that fail to be updated will show up as error logs.
 
