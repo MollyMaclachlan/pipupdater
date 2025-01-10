@@ -169,10 +169,8 @@ def entry_point():
     args: Namespace = get_args()
     config: dict[str, Any] = get_config(logger)
 
-    if args.debug:
-        logger.edit_scope("DEBUG", Categories.MAXIMUM)
-    elif args.save_pip:
-        logger.edit_scope("DEBUG", Categories.SAVE)
+    logger.edit_scope("DEBUG", Categories.MAXIMUM if args.debug else Categories.DISABLED)
+    logger.add_scope("PIPOUTPUT", Categories.SAVE if args.save_pip else Categories.DISABLED)
 
     updater: Updater = Updater(args, logger, config["prefixes"])
     updater.update_all()
