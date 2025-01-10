@@ -174,9 +174,7 @@ def entry_point():
     elif args.save_pip:
         logger.edit_scope("DEBUG", Categories.SAVE)
 
-    prefixes: list[str] = ["DEPRECATION: ", "ERROR: ", "WARNING: ", "Package ", "-------"]
-
-    updater: Updater = Updater(args, logger, prefixes)
+    updater: Updater = Updater(args, logger, config["prefixes"])
     updater.update_all()
 
 
