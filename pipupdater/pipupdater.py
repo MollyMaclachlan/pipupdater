@@ -33,7 +33,7 @@ from tomllib import load, loads
 from typing import Any
 
 
-VERSION = "1.1.0-alpha"
+VERSION = "1.1.0"
 
 
 class Updater():
