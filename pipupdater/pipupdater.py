@@ -180,10 +180,10 @@ def get_args() -> Namespace:
         description='A small command-line tool for automatically updating outdated pip packages.'
     )
 
-    parser.add_argument("--debug", "-d", action="store_true", help="enable debug logging")
-    parser.add_argument("--source", "-s", action="store", default=None,
+    parser.add_argument("-d", "--debug", action="store_true", help="enable debug logging")
+    parser.add_argument("-s", "--source", action="store", default=None,
                         help="provide a source file containing a list of outdated packages; if"
                         + " left blank, pipupdater will query pip for this list")
-    parser.add_argument("--version", "-v", action="version", version=f"%(prog)s {VERSION}")
+    parser.add_argument("-v", "--version", action="version", version=f"%(prog)s {VERSION}")
 
     return parser.parse_args()
