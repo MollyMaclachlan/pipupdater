@@ -169,7 +169,7 @@ def entry_point():
     updater.update_all()
 
 
-def get_args():
+def get_args() -> Namespace:
     """
     Uses an ArgumentParser to parse in command-line arguments and return the resultant Namespace.
 
