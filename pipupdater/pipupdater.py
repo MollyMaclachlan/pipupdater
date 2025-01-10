@@ -16,14 +16,21 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 import argparse
+import shutil
 import subprocess
 import sys
 
 from .logger import Logger
 from .utility import str_starts_with
 from argparse import Namespace
+from importlib.resources import files
+from os import makedirs
+from os.path import exists
+from platformdirs import user_config_dir
 from smooth_logger.enums import Categories
 from subprocess import CompletedProcess
+from tomllib import load, loads
+from typing import Any
 
 
 VERSION = "1.1.0-alpha"
@@ -87,7 +94,7 @@ class Updater():
         Gets a list of outdated modules using the 'pip list --outdated' command. If this method
         fails, pipupdater cannot continue and exits with status code 1.
 
-        :return: a list of outdated pip packages
+        :returns: a list of outdated pip packages
         """
         try:
             if self.args.source is None:
@@ -157,16 +164,16 @@ def entry_point():
     """
     Entry point for the program. Creates the logger and prefixes array and starts the main function.
     """
-    args: Namespace = get_args()
+    logger: Logger = Logger("pipupdater")
 
-    logger: Logger = Logger(
-        "pipupdater",
-        debug = (
-            Categories.MAXIMUM if args.debug
-            else Categories.SAVE if args.save_pip
-            else Categories.DISABLED
-        )
-    )
+    args: Namespace = get_args()
+    config: dict[str, Any] = get_config(logger)
+
+    if args.debug:
+        logger.edit_scope("DEBUG", Categories.MAXIMUM)
+    elif args.save_pip:
+        logger.edit_scope("DEBUG", Categories.SAVE)
+
     prefixes: list[str] = ["DEPRECATION: ", "ERROR: ", "WARNING: ", "Package ", "-------"]
 
     updater: Updater = Updater(args, logger, prefixes)
@@ -193,3 +200,33 @@ def get_args() -> Namespace:
     parser.add_argument("-v", "--version", action="version", version=f"%(prog)s {VERSION}")
 
     return parser.parse_args()
+
+
+def get_config(logger: Logger) -> dict[str, Any]:
+    """Get user config options. If the pipupdater config file doesn't exist, try to create it using
+    the default config options. If not possible, use default config options for this run and warn
+    the user that no config file exists.
+
+    :param logger: the logger
+    :returns: as a dict, the config options
+    """
+    try:
+        config_folder: str = f"{user_config_dir()}/pipupdater"
+
+        if not exists(config_folder):
+            makedirs(config_folder)
+
+        if exists(f"{config_folder}/config.toml"):
+            with open(f"{config_folder}/config.toml", "rb") as config_file:
+                return load(config_file)
+        else:
+            with open(f"{config_folder}/config.toml", "w+") as config_file:
+                default: str = files('pipupdater.data').joinpath('default_config.toml').read_text()
+                config_file.write(default)
+                return loads(default)
+    except Exception as e:
+        logger.new(
+            "Could not find existing config file or make a new one. Using default settings.",
+            "WARNING"
+        )
+        return loads(files('pipupdater.data').joinpath('default_config.toml').read_text())
