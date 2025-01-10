@@ -1,3 +1,9 @@
+# This is the config file for the 'pipupdater' program. You can edit the values below to modify the
+# behaviour of the program.
+
+
+# The prefixes that pipupdater uses to recognise lines that should be skipped in the output of pip
+# subprocesses. Lines starting with these strings won't be scanned for package upgrades.
 prefixes = [
     "DEPRECATION: ",
     "ERROR: ",
