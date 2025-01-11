@@ -1,5 +1,5 @@
 from setuptools import setup, find_packages
-from pipupdater import VERSION
+from pipupdater.cfg import VERSION
 
 
 def readme():
@@ -21,7 +21,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'pipupdater = pipupdater.pipupdater:entry_point'
+            'pipupdater = pipupdater.cmd:entry_point'
         ]
     },
     classifiers=[
