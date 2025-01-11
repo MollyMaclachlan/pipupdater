@@ -16,13 +16,29 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 
-from .cmd import entry_point
+import shutil
 
 from .cfg import get_args
 from .cfg import get_config
-from .cfg import VERSION
-
-from .helpers import str_starts_with
-
 from .models import Logger
 from .models import Updater
+
+from argparse import Namespace
+from smooth_logger.enums import Categories
+from typing import Any
+
+
+def entry_point():
+    """
+    Entry point for the program. Creates the logger and prefixes array and starts the main function.
+    """
+    logger: Logger = Logger("pipupdater")
+
+    args: Namespace = get_args()
+    config: dict[str, Any] = get_config(logger)
+
+    logger.edit_scope("DEBUG", Categories.MAXIMUM if args.debug else Categories.DISABLED)
+    logger.add_scope("PIPOUTPUT", Categories.SAVE if args.save_pip else Categories.DISABLED)
+
+    updater: Updater = Updater(args, logger, config["prefixes"])
+    updater.update_all()
