@@ -21,5 +21,5 @@ Here's a list of things I plan to add or at least look into adding:
 - [x] A proper setup file
 - [x] Allow running as a single command
 - [x] Properly capture & hide terminal output from pip commands
-- [ ] User config options
+- [x] User config options
 - [ ] Dependency conflict management? (maybe) (possibly)
