@@ -137,6 +137,7 @@ class Updater():
         :param logger: the logger instance
         """
         try:
+            self.logger.new(f"Updating package: {package_details[0]}...", "INFO")
             process: CompletedProcess = subprocess.run(
                 ["pip", "install", "-U", package_details[0]],
                 stdout=subprocess.PIPE,
