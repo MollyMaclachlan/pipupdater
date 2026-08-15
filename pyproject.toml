@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pipupdater"
+dynamic = ["version"]
+dependencies = [
+    "smooth_logger >= 1.0.0",
+    "tomlkit",
+]
+requires-python = ">= 3.9"
+authors = [
+    {name = "Molly Maclachlan", email = "molly@maclachlans.org.uk"}
+]
+description = "A small command-line tool for automatically updating outdated pip packages."
+readme = "README.md"
+license = "AGPL-3.0-or-later"
+license-files = ["LICENSE"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+]
+
+[project.scripts]
+pipupdater = "pipupdater.cmd:entry_point"
+
+[project.urls]
+Repository = "https://github.com/MollyMaclachlan/pipupdater"
+Issues = "https://github.com/MollyMaclachlan/pipupdater/issues"
+
+[tool.setuptools.dynamic]
+version = {attr = "pipupdater.cfg.__version__"}
