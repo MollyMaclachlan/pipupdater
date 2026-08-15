@@ -15,12 +15,11 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-
 from .cmd import entry_point
 
 from .cfg import get_args
 from .cfg import get_config
-from .cfg import VERSION
+from .cfg import __version__
 
 from .helpers import str_starts_with
 
