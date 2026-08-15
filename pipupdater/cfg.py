@@ -17,6 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 import argparse
+import copy
 import difflib
 import tomlkit
 import sys
@@ -29,7 +30,7 @@ from os import makedirs
 from os.path import exists
 from platformdirs import user_config_dir
 from tomlkit import TOMLDocument
-from typing import Any, List
+from typing import Any, List, Mapping
 
 
 __version__ = "1.2.0-alpha"
@@ -99,32 +100,89 @@ def import_new_config(
     exists). Any keys missing from the user's file will be imported from the default and written
     to the existing file.
 
-    Strictly speaking, this function imports the existing configuration options into the default
-    config file.
-
-    Presently, this function does not support importing new entries in existing arrays, only entirely
-    new keys, and consequently new default prefixes cannot be imported. This functionality will be
-    added in a future update.
+    New keys within tables and new items within lists are imported, while preserving any the
+    user has added. See the deep_update() docstring for more detailed explanations of the exact
+    functionality of how new keys are imported.
 
     :param existing: the existing config options
+    :param config_folder: the path to pipupdater's config folder
+    :param logger: the logger
     :returns: the modified config options
     """
     modified: bool = False
+    original: TOMLDocument = copy.deepcopy(existing)
     default: TOMLDocument = tomlkit.loads(
         files('pipupdater.data').joinpath('default_config.toml').read_text()
     )
 
     if (default.as_string() != existing.as_string()):
-        default.update(existing)
-        modified = True
+        existing = deep_update(default, existing)
 
-    if modified:
+    if (original.as_string() != existing.as_string()):
         logger.new(
             "New configuration options were detected in the default config file. Adding them to"
             + " existing config.",
             "INFO"
         )
         with open(f"{config_folder}/config.toml", "w+") as config_file:
-            tomlkit.dump(default, config_file)
+            tomlkit.dump(existing, config_file)
     
-    return default
+    return existing
+
+
+def deep_update(source: Any, target: Any) -> Any:
+    """
+    Performs a "deep update" on a TOMLDocument. The standard tomlkit .update() method overwrites
+    existing keys with the new versions, losing any configurations the user had entered. This
+    instead performs a merge, delving into tables and lists and preserving user settings for
+    existing keys.
+
+    This method does not support importing new comments in the following scenarios:
+    - Comments in top level whitespace, detached from any key.
+    - Comments attached to new keys added to existing tables.
+
+    This is because tomlkit refuses to import comments in those scenarios, for whatever reason.
+    Comments attached to keys in new tables *will* be imported, however comments direclty preceeding
+    the table itself will not be. I might look into writing a TOML parser that's actually functional
+    if I have the time.
+
+    This method is based on the algorithm written by contributor frostming on the tomlkit GitHub
+    repository (https://github.com/python-poetry/tomlkit/issues/255#issuecomment-1407551898). My
+    version is a disgusting bastardisation with a slightly different functionality.
+
+    :param source: the document from which new values are sourced
+    :param target: the document being updated
+    :returns: the updated document
+    """
+    for key, value in source.items():
+        if isinstance(value, Mapping) and value:
+            if target.get(key) is not None:
+                deep_update(value, target.get(key))
+            else:
+                target[key] = source[key]
+        elif isinstance(value, tomlkit.items.Array):
+            target[key] = deep_update_array(value, target.get(key))
+        else:
+            if hasattr(target, 'keys'):
+                if key not in target.keys():
+                    target[key] = source[key]
+            else:
+                target[key] = source[key]
+    return target
+
+
+def deep_update_array(
+        source: tomlkit.items.Array,
+        target: tomlkit.items.Array) -> tomlkit.items.Array:
+    """
+    Performs a merge on two tomlkit Arrays. This method assumes the Array is multiline and adds
+    each new item from the source array to the original as a new line appended with a comma.
+
+    :param source: the array from which new items are sourced
+    :param target: the array being updated
+    :returns: the merged array
+    """
+    for item in source:
+        if item not in target:
+            target.add_line(item, add_comma=True)
+    return target
