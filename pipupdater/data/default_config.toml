@@ -1,7 +1,6 @@
 # This is the config file for the 'pipupdater' program. You can edit the values below to modify the
 # behaviour of the program.
 
-
 # The prefixes that pipupdater uses to recognise lines that should be skipped in the output of pip
 # subprocesses. Lines starting with these strings won't be scanned for package upgrades.
 prefixes = [
@@ -11,3 +10,9 @@ prefixes = [
     "Package ",
     "-------"
 ]
+
+# Default settings for scope levels in the Logger. If either of these are set to true, they will
+# be enabled even if their corresponding command-line flag is not passed at runtime.
+[logger]
+debug = false        # corresponding flag: --debug
+pipoutput = false    # corresponding flag: --save-pip
