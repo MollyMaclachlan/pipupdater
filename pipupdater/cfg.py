@@ -91,6 +91,22 @@ def get_config(logger: Logger) -> dict[str, Any]:
         ).unwrap()
 
 
+def modify_args(args: Namespace, config: dict[str, Any]) -> Namespace:
+    """
+    Modifies the args Namespace with values imported from the config file. This method will always
+    overwrite False variables, but never True ones; that is, if --debug is not passed, but debug is
+    true in the config file, it will be set to True, but if --debug *is* passed and is false in the
+    config file, it will not be set to False in runtime.
+
+    :param args: the command-line arguments
+    :param config: the config file data
+    :returns: the modified args Namespace
+    """
+    if config["logger"]["debug"]: args.debug = True
+    if config["logger"]["pipoutput"]: args.save_pip = True
+    return args
+
+
 def import_new_config(
         existing: TOMLDocument,
         config_folder: str,

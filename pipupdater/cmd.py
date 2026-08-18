@@ -20,6 +20,7 @@ import shutil
 
 from .cfg import get_args
 from .cfg import get_config
+from .cfg import modify_args
 from .models import Logger
 from .models import Updater
 
@@ -36,6 +37,8 @@ def entry_point():
 
     args: Namespace = get_args()
     config: dict[str, Any] = get_config(logger)
+
+    args = modify_args(args, config)
 
     logger.edit_scope("DEBUG", Categories.MAXIMUM if args.debug else Categories.DISABLED)
     logger.add_scope("PIPOUTPUT", Categories.SAVE if args.save_pip else Categories.DISABLED)
